@@ -3,6 +3,7 @@ package com.amirkenesbay.service.impl;
 import com.amirkenesbay.dao.AppUserDAO;
 import com.amirkenesbay.dao.RawDataDAO;
 import com.amirkenesbay.entity.AppDocument;
+import com.amirkenesbay.entity.AppPhoto;
 import com.amirkenesbay.entity.AppUser;
 import com.amirkenesbay.entity.RawData;
 import com.amirkenesbay.exceptions.UploadFileException;
@@ -89,10 +90,17 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        // TODO добавить сохранения фото
-        var answer = "Фото успешно загружено! " +
-                        "Ссылка для скачивания: [скоро будет доступна]";
-        sendAnswer(answer, chatId);
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            // TODO добавить сохранения фото
+            var answer = "Фото успешно загружено! " +
+                    "Ссылка для скачивания: [скоро будет доступна]";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex);
+            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendAnswer(error, chatId);
+        }
     }
 
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
