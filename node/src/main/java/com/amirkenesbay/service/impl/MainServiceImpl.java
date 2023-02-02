@@ -67,9 +67,17 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        // TODO добавить сохранения документа
-        var answer = "Документ успешно загружен! Ссылка для скачивания: ";
-        sendAnswer(answer, chatId);
+        try {
+            AppDocument doc = fileService.processDoc(update.getMessage());
+            // TODO Добавить генерацию ссылки для скачивания документа
+            var answer = "Документ успешно загружен! " +
+                            "Ссылка для скачивания: [скоро будет доступна]";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex);
+            String error = "К сожалению, загрузка файла не удалась. Повторите попытку позже.";
+            sendAnswer(error, chatId);
+        }
     }
 
     @Override
