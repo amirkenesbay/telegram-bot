@@ -2,9 +2,13 @@ package com.amirkenesbay.service.impl;
 
 import com.amirkenesbay.dao.AppUserDAO;
 import com.amirkenesbay.dao.RawDataDAO;
+import com.amirkenesbay.entity.AppDocument;
 import com.amirkenesbay.entity.AppUser;
 import com.amirkenesbay.entity.RawData;
+import com.amirkenesbay.exceptions.UploadFileException;
+import com.amirkenesbay.service.FileService;
 import com.amirkenesbay.service.MainService;
+import com.amirkenesbay.service.enums.ServiceCommand;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -13,19 +17,21 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import static com.amirkenesbay.entity.enums.UserState.BASIC_STATE;
 import static com.amirkenesbay.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
-import static com.amirkenesbay.service.enums.ServiceCommands.*;
+import static com.amirkenesbay.service.enums.ServiceCommand.*;
 
-@Service
 @Log4j
+@Service
 public class MainServiceImpl implements MainService {
     private final RawDataDAO rawDataDAO;
     private final ProducerServiceImpl producerServiceImpl;
     private final AppUserDAO appUserDAO;
+    private final FileService fileService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerServiceImpl producerServiceImpl, AppUserDAO appUserDAO) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerServiceImpl producerServiceImpl, AppUserDAO appUserDAO, FileService fileService) {
         this.rawDataDAO = rawDataDAO;
         this.producerServiceImpl = producerServiceImpl;
         this.appUserDAO = appUserDAO;
+        this.fileService = fileService;
     }
 
     @Override
@@ -35,7 +41,9 @@ public class MainServiceImpl implements MainService {
         var userState = appUser.getState();
         var text = update.getMessage().getText();
         var output = "";
-        if (CANCEL.equals(text)) {
+
+        var serviceCommand = ServiceCommand.fromValue(text);
+        if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommands(appUser, text);
@@ -74,14 +82,16 @@ public class MainServiceImpl implements MainService {
         }
 
         // TODO добавить сохранения фото
-        var answer = "Фото успешно загружено! Ссылка для скачивания: ";
+        var answer = "Фото успешно загружено! " +
+                        "Ссылка для скачивания: [скоро будет доступна]";
         sendAnswer(answer, chatId);
     }
 
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
         var userState = appUser.getState();
         if (!appUser.getIsActive()) {
-            var error = "Зарегистрируйтесь или активируйте свою учетную запись для загрузки контента";
+            var error = "Зарегистрируйтесь или активируйте " +
+                            "свою учетную запись для загрузки контента";
             sendAnswer(error, chatId);
         } else if (!BASIC_STATE.equals(userState)) {
             var error = "Отмените текущую команду с помощью /cancel для отправки файлов.";
@@ -99,12 +109,13 @@ public class MainServiceImpl implements MainService {
     }
 
     private String processServiceCommands(AppUser appUser, String cmd) {
-        if (REGISTRATION.equals(cmd)) {
+        var serviceCommand = ServiceCommand.fromValue(cmd);
+        if (REGISTRATION.equals(serviceCommand)) {
             // TODO добавить регистрацию
             return "Временно недоступно";
-        } else if (HELP.equals(cmd)) {
+        } else if (HELP.equals(serviceCommand)) {
             return help();
-        } else if (START.equals(cmd)) {
+        } else if (START.equals(serviceCommand)) {
             return "Приветствую! Чтобы посмотреть список доступных команд введите /help";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
