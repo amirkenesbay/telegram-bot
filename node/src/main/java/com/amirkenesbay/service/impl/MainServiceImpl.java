@@ -9,6 +9,7 @@ import com.amirkenesbay.entity.RawData;
 import com.amirkenesbay.exceptions.UploadFileException;
 import com.amirkenesbay.service.FileService;
 import com.amirkenesbay.service.MainService;
+import com.amirkenesbay.service.enums.LinkType;
 import com.amirkenesbay.service.enums.ServiceCommand;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -70,9 +71,9 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppDocument doc = fileService.processDoc(update.getMessage());
-            // TODO Добавить генерацию ссылки для скачивания документа
+            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);
             var answer = "Документ успешно загружен! " +
-                            "Ссылка для скачивания: [скоро будет доступна]";
+                            "Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex);
@@ -92,9 +93,9 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            // TODO добавить сохранения фото
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
             var answer = "Фото успешно загружено! " +
-                    "Ссылка для скачивания: [скоро будет доступна]";
+                    "Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex);
