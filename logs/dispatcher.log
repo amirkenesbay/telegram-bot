@@ -4,3 +4,13 @@
 2022-12-24 03:14:34 DEBUG TelegramBot:29 - asd
 2022-12-24 03:14:36 DEBUG TelegramBot:29 - asdasdasd
 2022-12-24 03:19:04 DEBUG TelegramBot:31 - Hello from chat
+2023-02-13 22:45:32 DEBUG UpdateProducerImpl:20 - hello
+2023-02-13 22:45:35 DEBUG UpdateProducerImpl:20 - /help
+2023-02-13 22:45:38 DEBUG UpdateProducerImpl:20 - /registration
+2023-02-13 22:45:40 DEBUG UpdateProducerImpl:20 - /cancel
+2023-02-13 22:45:50 DEBUG UpdateProducerImpl:20 - 
+2023-02-13 23:21:34 DEBUG UpdateProducerImpl:20 - 
+2023-02-13 23:22:38 DEBUG UpdateProducerImpl:20 - 
+2023-02-13 23:27:51 DEBUG UpdateProducerImpl:20 - 
+2023-02-14 16:17:24 DEBUG UpdateProducerImpl:20 - 
+2023-02-14 16:17:50 DEBUG UpdateProducerImpl:20 - 
